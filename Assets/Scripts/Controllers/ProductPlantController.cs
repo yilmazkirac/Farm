@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using DefaultNamespace;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ProductPlantController : MonoBehaviour
@@ -23,9 +20,13 @@ public class ProductPlantController : MonoBehaviour
         if (other.CompareTag("Player")&&_isReadyToPick)
         {
             _bagController = other.GetComponent<BagConrtoller>();
-            _bagController.AddProductToBag(productData.ProductPrefab);
-            _isReadyToPick = false;
-            StartCoroutine(ProductsPicked());
+            if (_bagController.IsEmptySpace())
+            {
+                AudioManager.Instance.PlayAudio(AudioClipType.grabClip);
+                _bagController.AddProductToBag(productData);
+                _isReadyToPick = false;
+                StartCoroutine(ProductsPicked());
+            }
         }
     }
 
@@ -33,7 +34,7 @@ public class ProductPlantController : MonoBehaviour
     {
         Vector3 targetScale = _originalcale / 3;
         transform.gameObject.LeanScale(targetScale, 1f);
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(10f);
         transform.gameObject.LeanScale(_originalcale, 1f).setEase(LeanTweenType.easeOutBack);
         _isReadyToPick = true;
     }
